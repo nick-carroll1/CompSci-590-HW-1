@@ -82,6 +82,8 @@ if __name__ == "__main__":
             total_loss += losses.sum()
             grad = grad_theta_fn(X_i, Y_i, theta)
             grad /= bsz # average over all the gradients in the batch
+            # print(theta.shape, eta, grad.shape, nex)
+            # print(theta - grad)
             theta = theta - eta * grad/nex
             nexamples += nex
 
