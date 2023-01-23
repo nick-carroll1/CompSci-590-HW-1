@@ -112,7 +112,8 @@ def softmse(X, Y, theta):
     returns:
        bsz-length array of losses
     """
-    return 1 / Y.shape[1] * (Y - softmax(np.matmul(X, theta.T))) ** 2
+
+    return 1 / Y.shape[0] * np.sum(np.diagonal(np.matmul((Y - softmax(np.matmul(X, theta.T))).T, (Y - softmax(np.matmul(X, theta.T))))), keepdims= True)
 
 
 def grad_theta_softmse(X, Y, theta):
@@ -123,7 +124,11 @@ def grad_theta_softmse(X, Y, theta):
     returns:
         K x D_1 gradient of softmse(X, Y, theta).sum() wrt theta
     """
-    return 2 / Y/shape[1] * (Y - softmax(np.matmul(X, theta.T))), (np.matmul(softmax(np.matmul(X, theta.T)).T, X) - np.matmul(softmax(np.matmul(X, theta.T)).T, softmax(np.matmul(X, theta.T))))
+    # return 2 / Y/shape[1] * (Y - softmax(np.matmul(X, theta.T))), (np.matmul(softmax(np.matmul(X, theta.T)).T, X) - np.matmul(softmax(np.matmul(X, theta.T)).T, softmax(np.matmul(X, theta.T))))
+
+    b = Y.shape[0]
+
+    return 1 / b * (-np.matmul(Y.T, softmax(X)) + np.sum(softmax(X), axis = 0, keepdims=True))
 
 
 def myloss(X, Y, theta):
@@ -160,15 +165,22 @@ def softmax(X):
 
 def finiteDifferences(X, Y, theta):
     e = np.identity(theta.shape[1])
+    e2 = (np.vstack((e[0], np.zeros((theta.shape[0] - 1, theta.shape[1]))))) 
     e3 = np.hstack((np.zeros((theta.shape[0], theta.shape[1]//2)), np.ones((theta.shape[0], theta.shape[1] - theta.shape[1]//2))))
     constant = 1 / 10 ** 5
-    # print((mse(X, Y, theta + e[0, :] * constant) - mse(X, Y, theta - e[0, :] * constant)) / (2 * np.sqrt(theta.shape[1])))
+    print(grad_theta_mse(X, Y, theta)[0, 0])
+    print((mse(X, Y, theta + e2 * constant) - mse(X, Y, theta - e2 * constant)) / (2 * constant))
+    print(grad_theta_xent(X, Y, theta)[0, 0])
+    print((xent(X, Y, theta + e2 * constant) - xent(X, Y, theta - e2 * constant)) / (2 * constant))
+    print(grad_theta_softmse(X, Y, theta)[0, 0])
+    print((softmse(X, Y, theta + e2 * constant) - softmse(X, Y, theta - e2 * constant)) / (2 * constant))
     # print(mse(X, Y, theta))
-    print(softmse(X, Y, theta))
+    # print(softmse(X, Y, theta))
     # print(grad_theta_mse(X, Y, theta)[0, 0])
     # print(mse(X, Y, e2))
     # print(mse(X, Y, np.matmul(e2, e * (1 + constant))) - mse(X, Y, np.matmul(e2, e * (1 - constant))))
     # print(theta)
+    # print(grad_theta_mse(X, Y, theta))
     # print(theta + e3 * constant)
     # epsilon = 1 / 10 ** 5
     # # print(grad_theta_xent(X, Y, theta))
