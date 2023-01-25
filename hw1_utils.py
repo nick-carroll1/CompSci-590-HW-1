@@ -92,7 +92,7 @@ def softmse(X, Y, theta):
        bsz-length array of losses
     """
 
-    return 1 / Y.shape[0] * np.sum(np.diagonal(np.matmul((Y - softmax(np.matmul(X, theta.T))).T, (Y - softmax(np.matmul(X, theta.T))))), keepdims= True)
+    return 1 / Y.shape[0] / Y.shape[1] * np.sum(np.diagonal(np.matmul((Y - softmax(np.matmul(X, theta.T))).T, (Y - softmax(np.matmul(X, theta.T))))), keepdims= True)
 
 
 def grad_theta_softmse(X, Y, theta):
@@ -118,6 +118,8 @@ def myloss(X, Y, theta):
     returns:
        bsz-length array of losses
     """
+    # Uncomment the below function and comment the return function to compare the finite differences.
+
     # finiteDifferences(X,Y, theta)
 
     k = Y.shape[1]
@@ -157,10 +159,18 @@ def finiteDifferences(X, Y, theta):
     e2 = (np.vstack((e[0], np.zeros((theta.shape[0] - 1, theta.shape[1]))))) 
     e3 = np.hstack((np.zeros((theta.shape[0], theta.shape[1]//2)), np.ones((theta.shape[0], theta.shape[1] - theta.shape[1]//2))))
     constant = 1 / 10 ** 5
-    print(grad_theta_mse(X, Y, theta)[0, 0])
-    print((mse(X, Y, theta + e2 * constant) - mse(X, Y, theta - e2 * constant)) / (2 * constant))
-    print(grad_theta_xent(X, Y, theta)[0, 0])
-    print((xent(X, Y, theta + e2 * constant) - xent(X, Y, theta - e2 * constant)) / (2 * constant))
-    print(grad_theta_softmse(X, Y, theta)[0, 0])
-    print((softmse(X, Y, theta + e2 * constant) - softmse(X, Y, theta - e2 * constant)) / (2 * constant))
-    # print(mse(X, Y, theta))
+    b = Y.shape[0]
+    for loop in range(0, 3):
+        grad_point1 = np.random.randint(0, theta.shape[0])
+        grad_point2 = np.random.randint(0, theta.shape[1])
+        print(f"Cross Entropy gradient value: {grad_theta_xent(X, Y, theta)[grad_point1, grad_point2] / b}")
+        print(f"Cross Entropy observed change: {(xent(X, Y, theta + e2 * constant) - xent(X, Y, theta - e2 * constant)) / (2 * constant)}")
+        print(f"ratio: {grad_theta_xent(X, Y, theta)[grad_point1, grad_point2] / b / ((xent(X, Y, theta + e2 * constant) - xent(X, Y, theta - e2 * constant)) / (2 * constant))}")
+        print(f"MSE gradient value: {grad_theta_mse(X, Y, theta)[grad_point1, grad_point2] / b}")
+        print(f"MSE observed change: {(mse(X, Y, theta + e2 * constant) - mse(X, Y, theta - e2 * constant)) / (2 * constant)}")
+        print(f"ratio: {grad_theta_mse(X, Y, theta)[grad_point1, grad_point2] / b / ((mse(X, Y, theta + e2 * constant) - mse(X, Y, theta - e2 * constant)) / (2 * constant))}")
+        print(f"SoftMSE gradient value: {grad_theta_softmse(X, Y, theta)[grad_point1, grad_point2] / b}")
+        print(f"SoftMSE observed change: {(softmse(X, Y, theta + e2 * constant) - softmse(X, Y, theta - e2 * constant)) / (2 * constant)}")
+        print(f"ratio {grad_theta_softmse(X, Y, theta)[grad_point1, grad_point2] / b / ((softmse(X, Y, theta + e2 * constant) - softmse(X, Y, theta - e2 * constant)) / (2 * constant))}")
+        # print(f"MyLoss gradient value: {grad_theta_myloss(X, Y, theta)[0, 0]}")
+        # print(f"MyLoss observed change: {(myloss(X, Y, theta + e2 * constant) - myloss(X, Y, theta - e2 * constant)) / (2 * constant)}")
