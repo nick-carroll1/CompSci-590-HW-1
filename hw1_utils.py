@@ -118,9 +118,6 @@ def myloss(X, Y, theta):
     returns:
        bsz-length array of losses
     """
-    # Uncomment the below function and comment the return function to compare the finite differences.
-
-    # finiteDifferences(X,Y, theta)
 
     k = Y.shape[1]
     s = np.matmul(X, theta.T)
@@ -172,5 +169,15 @@ def finiteDifferences(X, Y, theta):
         print(f"SoftMSE gradient value: {grad_theta_softmse(X, Y, theta)[grad_point1, grad_point2] / b}")
         print(f"SoftMSE observed change: {(softmse(X, Y, theta + e2 * constant) - softmse(X, Y, theta - e2 * constant)) / (2 * constant)}")
         print(f"ratio {grad_theta_softmse(X, Y, theta)[grad_point1, grad_point2] / b / ((softmse(X, Y, theta + e2 * constant) - softmse(X, Y, theta - e2 * constant)) / (2 * constant))}")
-        # print(f"MyLoss gradient value: {grad_theta_myloss(X, Y, theta)[0, 0]}")
-        # print(f"MyLoss observed change: {(myloss(X, Y, theta + e2 * constant) - myloss(X, Y, theta - e2 * constant)) / (2 * constant)}")
+        print(f"MyLoss gradient value: {grad_theta_myloss(X, Y, theta)[0, 0]}")
+        print(f"MyLoss observed change: {(myloss(X, Y, theta + e2 * constant) - myloss(X, Y, theta - e2 * constant)) / (2 * constant)}")
+
+if __name__ == '__main__':
+    from hw1_main import get_mnist_data, batchify
+    X, Y, val_X, val_Y = get_mnist_data()
+    X = np.hstack((X, np.ones((X.shape[0], 1))))
+    val_X = np.hstack((val_X, np.ones((val_X.shape[0], 1))))
+    theta = np.zeros((Y.shape[1], X.shape[1])) # K x D_1
+    bsz = 64
+    Xs, Ys = batchify(X, Y, bsz)
+    finiteDifferences(Xs[0],Ys[0], theta)
